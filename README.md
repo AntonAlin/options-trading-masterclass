@@ -53,12 +53,46 @@ notebook, then goes further into market-making mechanics and systematic trading.
 9. Case study — Volmageddon, February 5, 2018
 10. Model comparison and full references
 
+### `cross_venue_information_share.ipynb`
+
+Original research rather than training material: an econometric instrument for asking **where
+informed traders actually transact — spot, or the leveraged derivative?** (Black 1975; Easley,
+O'Hara & Srinivas 1998). The design exploits a data advantage that is rare outside crypto: the
+Binance public archive carries an exact aggressor flag on *both* the spot and the perpetual-future
+tape for the same symbol on the same clock, so trade direction is never inferred with Lee-Ready.
+
+What the notebook actually establishes is a **methodological negative result**:
+
+1. Standard price-discovery machinery (VECM, Gonzalo-Granger component shares, Hasbrouck
+   information shares with Cholesky-ordering bounds), validated against a planted truth.
+2. The natural flow-based extension — decomposing the efficient-price innovation across the two
+   venues' signed order flow via an order-invariant LMG/Shapley decomposition.
+3. **A demonstration that this fails.** Under a null of *equally informed* venues, ordinary
+   microstructure asymmetry (transitory noise-trade impact, quote-adjustment speed) biases the
+   statistic by up to **0.37** — the same magnitude as any effect it could plausibly detect. On
+   real data it would return a large, significant, entirely spurious number with nothing in the
+   output to signal a problem.
+4. **The fix**: Hasbrouck (1991) long-run cumulative impulse response, which isolates *permanent*
+   flow impact by construction, since transitory impact reverses inside the response horizon.
+5. **Verification**: unbiased under every asymmetry tested (0.498–0.502 against a truth of 0.500),
+   near-exact recovery of the true share (max error 0.006), plus a power analysis, a
+   funding-settlement natural experiment with a pre-specified placebo, and a pre-registered
+   analysis plan.
+
+The notebook makes **no empirical claim about real markets** — the environment it was written in
+blocked the data source, so the real-data driver is written and gated behind a flag. It is a
+validated instrument, not a finding. A staleness diagnostic that degrades *both* estimators is
+reported rather than buried, as the thing most likely to sink the study.
+
+The real-data section expects the loaders from the companion
+[`microstructure-lab`](https://github.com/AntonAlin/microstructure-lab) repo.
+
 Every model is either cross-checked against a second, independently-derived method (e.g.
 closed-form Greeks vs. finite differences, a tree vs. Black-Scholes, Heston's Fourier price vs.
 its own Monte Carlo simulation, exact CIR simulation vs. the semi-analytic VIX futures price) or
 validated against a model-free identity (put-call parity, no-arbitrage conditions on the vol
-surface, Jensen's inequality). Both notebooks print and assert these checks inline rather than
-just asserting the final numbers are right.
+surface, Jensen's inequality). All three notebooks print and assert these checks inline rather
+than just asserting the final numbers are right.
 
 ## Running it
 
@@ -66,10 +100,11 @@ just asserting the final numbers are right.
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 jupyter notebook options_trading_masterclass.ipynb   # or vix_futures_market_making.ipynb
+                                                     # or cross_venue_information_share.ipynb
 ```
 
-Both notebooks run end-to-end in well under a couple of minutes on a single core — nothing in
-them depends on external data or network access. Every "market" used to demonstrate calibration
+All three notebooks run end-to-end in a couple of minutes on a single core, and none of them
+requires external data or network access to reproduce every result shown. Every "market" used to demonstrate calibration
 or backtesting (smiles, surfaces, VX term structures, trading episodes) is generated
 synthetically from a model built earlier in the same notebook, so results are fully
 reproducible and every backtest is a Monte Carlo stress test against the model rather than a
@@ -77,7 +112,8 @@ historical replay.
 
 ## Scope and disclaimer
 
-This is educational material on derivatives pricing and market-making theory, not investment
+The first two notebooks are educational material on derivatives pricing and market-making
+theory; the third is exploratory research methodology. None of it is investment
 advice, and not production risk or trading infrastructure. Real trading systems need
 considerably more care around calibration stability, market data quality, and numerical edge
 cases than a teaching notebook can show.
@@ -87,4 +123,5 @@ cases than a teaching notebook can show.
 See each notebook's final section for full citations. Core sources include Black & Scholes
 (1973), Merton (1973, 1976), Cox-Ross-Rubinstein (1979), Brennan & Schwartz (1977), Heston
 (1993), Dupire (1994), Hagan et al. (2002), Longstaff & Schwartz (2001), Cox-Ingersoll-Ross
-(1985), Gruenbichler & Longstaff (1996), Broadie & Kaya (2006), and Avellaneda & Stoikov (2008).
+(1985), Gruenbichler & Longstaff (1996), Broadie & Kaya (2006), Avellaneda & Stoikov (2008),
+Hasbrouck (1991, 1995), Gonzalo & Granger (1995), and Easley, O'Hara & Srinivas (1998).
