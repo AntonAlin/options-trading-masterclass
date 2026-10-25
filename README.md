@@ -53,6 +53,30 @@ notebook, then goes further into market-making mechanics and systematic trading.
 9. Case study — Volmageddon, February 5, 2018
 10. Model comparison and full references
 
+### `options_market_making.ipynb`
+
+Written from the seat of an options market maker: not "what is this option worth" but *how
+wide do I quote and in what units, who is on the other side, how fast must I be before the
+underlying moves through my quotes, how do I hedge when every hedge costs money, and how does
+my inventory bend the surface I am quoting*. Every formula is plotted and cross-checked before
+it is used; the emphasis is on seeing the shapes, because for a market maker the Greeks *are*
+the inventory. Describes the business lines of the large firms (Citadel Securities, SIG,
+Optiver, IMC, Jane Street, Wolverine, Akuna, DRW, Flow Traders, the bank flow desks) from
+public sources and maps each to the mathematics that drives it. 49 cells, 21 figures,
+pre-executed; runs in about a minute.
+
+1. The business model — spread capture, hedging, warehousing residual Greeks, and the speed race; the firms and their public footprint
+2. Pricing engine and Greeks — delta, gamma, vega, theta, vanna, volga, charm, all checked against finite differences
+3. Quoting in volatility — vega as the price/vol exchange rate, and why the tick size makes the wings unquotable
+4. Adverse selection and latency — the half-normal pick-off closed form (verified by full repricing), a jump model showing why the cancel race is decided in microseconds, and the optimal spread vs. latency (Budish-Cramton-Shim)
+5. Delta hedging with costs — the pathwise P&L identity checked on simulated paths, the 1/sqrt(N) hedging-error law, Leland's volatility (verified against simulated costs), and the Whalley-Wilmott no-trade band on an efficiency frontier
+6. The surface as the quoting engine — raw SVI fitted to a noisy Heston market, Durrleman butterfly and calendar checks, sticky-strike vs. sticky-delta hedge ratios
+7. Flow segmentation — Glosten-Milgrom spread and sequential Bayesian quoting; why wholesaled retail flow is quoted tighter
+8. The strategies the large firms are known for — dispersion (vega-weighted vs. equal-notional P&L surfaces over realized vol and correlation), the borrow and the box as financing, additive earnings-event variance and the straddle trade, expiry-day gamma / 0DTE / pin risk, and the variance risk premium from Heston under P and Q
+9. Risk — the spot/vol P&L grid with its second-order Taylor residual, Greek ladders, and a Greek-space inventory penalty that shows how one customer trade bends every quote on the surface (Gârleanu-Pedersen-Poteshman)
+10. A full market-making simulation — Heston-with-jumps world, informed and elastic uninformed flow, a naive quoter vs. a desk with toxicity-priced spreads, inventory skew and a hedge band, with an exactly reconciled P&L explain (spread capture, gamma, theta, vega, net delta, costs) and Huang-Stoll effective vs. realized spread
+11. Method comparison, an honest list of what the notebook cannot show, and full references
+
 ### `cross_venue_information_share.ipynb`
 
 Original research rather than training material: an econometric instrument for asking **where
@@ -91,7 +115,7 @@ Every model is either cross-checked against a second, independently-derived meth
 closed-form Greeks vs. finite differences, a tree vs. Black-Scholes, Heston's Fourier price vs.
 its own Monte Carlo simulation, exact CIR simulation vs. the semi-analytic VIX futures price) or
 validated against a model-free identity (put-call parity, no-arbitrage conditions on the vol
-surface, Jensen's inequality). All three notebooks print and assert these checks inline rather
+surface, Jensen's inequality). All the notebooks print and assert these checks inline rather
 than just asserting the final numbers are right.
 
 ## Running it
@@ -99,11 +123,12 @@ than just asserting the final numbers are right.
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-jupyter notebook options_trading_masterclass.ipynb   # or vix_futures_market_making.ipynb
-                                                     # or cross_venue_information_share.ipynb
+jupyter notebook options_trading_masterclass.ipynb   # or vix_futures_market_making.ipynb,
+                                                     # options_market_making.ipynb,
+                                                     # cross_venue_information_share.ipynb
 ```
 
-All three notebooks run end-to-end in a couple of minutes on a single core, and none of them
+All the notebooks run end-to-end in a couple of minutes on a single core, and none of them
 requires external data or network access to reproduce every result shown. Every "market" used to demonstrate calibration
 or backtesting (smiles, surfaces, VX term structures, trading episodes) is generated
 synthetically from a model built earlier in the same notebook, so results are fully
@@ -112,8 +137,8 @@ historical replay.
 
 ## Scope and disclaimer
 
-The first two notebooks are educational material on derivatives pricing and market-making
-theory; the third is exploratory research methodology. None of it is investment
+The pricing, VIX and options market-making notebooks are educational material on derivatives
+pricing and market-making theory; the cross-venue notebook is exploratory research methodology. None of it is investment
 advice, and not production risk or trading infrastructure. Real trading systems need
 considerably more care around calibration stability, market data quality, and numerical edge
 cases than a teaching notebook can show.
@@ -124,4 +149,7 @@ See each notebook's final section for full citations. Core sources include Black
 (1973), Merton (1973, 1976), Cox-Ross-Rubinstein (1979), Brennan & Schwartz (1977), Heston
 (1993), Dupire (1994), Hagan et al. (2002), Longstaff & Schwartz (2001), Cox-Ingersoll-Ross
 (1985), Gruenbichler & Longstaff (1996), Broadie & Kaya (2006), Avellaneda & Stoikov (2008),
-Hasbrouck (1991, 1995), Gonzalo & Granger (1995), and Easley, O'Hara & Srinivas (1998).
+Hasbrouck (1991, 1995), Gonzalo & Granger (1995), Easley, O'Hara & Srinivas (1998), Glosten &
+Milgrom (1985), Budish, Cramton & Shim (2015), Leland (1985), Whalley & Wilmott (1997),
+Gatheral & Jacquier (2014), Gârleanu, Pedersen & Poteshman (2009), Driessen, Maenhout & Vilkov
+(2009), and Carr & Wu (2009).
